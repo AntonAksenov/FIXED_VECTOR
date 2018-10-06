@@ -114,9 +114,10 @@ public:
     }
 
     void clear() {
-        for (; _size >= 0; _size--) {
-            reinterpret_cast<const T *>(data + _size)->~T();
+        for (size_t i = 0; i < _size; i++) {
+            reinterpret_cast<const T *>(data + i)->~T();
         }
+        _size = 0;
     }
 
     T *begin() {
@@ -133,6 +134,22 @@ public:
 
     std::reverse_iterator<T *> rend() {
         return std::__make_reverse_iterator<T *>(begin());
+    }
+
+    T const *begin() const {
+        return reinterpret_cast<T const *>(data);
+    }
+
+    T const *end() const {
+        return reinterpret_cast<T const *>(data + _size);
+    }
+
+    std::reverse_iterator<T const *> rbegin() const {
+        return std::__make_reverse_iterator<T const *>(end());
+    }
+
+    std::reverse_iterator<T const *> rend() const {
+        return std::__make_reverse_iterator<T const *>(begin());
     }
 
     T *erase(T const *it) {
@@ -156,12 +173,12 @@ public:
         if (_size >= _capacity) {
             throw std::length_error("assigned capacity reached");
         }
-        T *index1 = end() - 1;
+        T *index1 = end();
         for (; index1 != index; index1--) {
-            std::cout << *index1 << std::endl;
             *index1 = *(index1 - 1);
         }
         *const_cast<T *>(index) = value;
+        _size++;
         return const_cast<T *>(index);
     }
 
